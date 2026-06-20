@@ -642,9 +642,10 @@ function setupContact(){
 
       var payload = {
         formType: 'contact',
-        name: contactForm.elements['name'].value,
-        email: contactForm.elements['email'].value,
-        message: contactForm.elements['message'].value
+        name: contactForm.elements['name'].value.trim(),
+        email: contactForm.elements['email'].value.trim().toLowerCase(),
+        phone: contactForm.elements['phone'].value.trim(),
+        message: contactForm.elements['message'].value.trim()
       };
 
       confirm.textContent = 'Saving your message…';
@@ -729,11 +730,91 @@ function setupSound(){
     el.addEventListener('mouseenter', function(){ beep(440, 0.04); });
   });
 }
+function setupStartDateRestriction() {
+  var dateInput = document.getElementById('startDate');
+
+  if (!dateInput) return;
+
+  var today = new Date();
+
+  var year = today.getFullYear();
+  var month = String(today.getMonth() + 1).padStart(2, '0');
+  var day = String(today.getDate()).padStart(2, '0');
+
+  var todayString = year + '-' + month + '-' + day;
+
+  // Prevent selecting any date before today.
+  dateInput.min = todayString;
+
+  dateInput.addEventListener('change', function () {
+    if (dateInput.value && dateInput.value < todayString) {
+      dateInput.value = '';
+      dateInput.setCustomValidity(
+        'Please select today or a future date.'
+      );
+      dateInput.reportValidity();
+    } else {
+      dateInput.setCustomValidity('');
+    }
+  });
+}
+function setupIdentityValidation() {
+  var emailInputs = document.querySelectorAll('input[type="email"]');
+  var phoneInputs = document.querySelectorAll('input[type="tel"]');
+
+  var emailPattern = /^[^\s@]+@[^\s@]+\.[A-Za-z]{2,}$/;
+  var phonePattern = /^[6-9][0-9]{9}$/;
+
+  emailInputs.forEach(function (input) {
+    input.addEventListener('input', function () {
+      var value = input.value.trim();
+
+      if (!value) {
+        input.setCustomValidity('');
+        return;
+      }
+
+      if (!emailPattern.test(value)) {
+        input.setCustomValidity(
+          'Please enter a valid email address, such as name@example.com.'
+        );
+      } else {
+        input.setCustomValidity('');
+      }
+    });
+
+    input.addEventListener('blur', function () {
+      input.value = input.value.trim().toLowerCase();
+    });
+  });
+
+  phoneInputs.forEach(function (input) {
+    input.addEventListener('input', function () {
+      // Remove spaces, letters, symbols and country-code characters.
+      input.value = input.value.replace(/\D/g, '').slice(0, 10);
+
+      if (!input.value) {
+        input.setCustomValidity('');
+        return;
+      }
+
+      if (!phonePattern.test(input.value)) {
+        input.setCustomValidity(
+          'Enter a valid 10-digit Indian mobile number beginning with 6, 7, 8 or 9.'
+        );
+      } else {
+        input.setCustomValidity('');
+      }
+    });
+  });
+}
 
 /* ============================================================
    INIT
    ============================================================ */
 document.addEventListener('DOMContentLoaded', function(){
+  setupIdentityValidation();
+  setupStartDateRestriction();
   setupCursor();
   setupNav();
   setupReveal();
