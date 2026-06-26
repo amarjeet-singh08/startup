@@ -200,7 +200,7 @@ input,select,textarea{ font-family:inherit; font-size:inherit; }
 
 .nav-brand{ display:flex; align-items:center; gap:10px; margin-right:auto; }
 .nav-mark{
-  width:34px; height:34px; border-radius:10px;
+  width:36px; height:34px; border-radius:10px;
   background:linear-gradient(135deg,var(--c-blue),var(--c-blue-deep));
   color:#fff; font-family:var(--font-display); font-weight:800; font-size:13px;
   display:flex; align-items:center; justify-content:center; letter-spacing:.02em;
